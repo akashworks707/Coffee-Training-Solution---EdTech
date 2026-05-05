@@ -33,6 +33,18 @@ const getMe = catchAsync(async (req: Request, res: Response, next: NextFunction)
     })
 })
 
+const getSingleUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id as string
+    const result = await UserServices.getSingleUser(userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User Retrieved Successfully",
+        data: result.data
+    })
+})
+
 const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const query = req.query;
     const result = await UserServices.getAllUsers(query as Record<string, string>);
@@ -46,8 +58,52 @@ const getAllUsers = catchAsync(async (req: Request, res: Response, next: NextFun
     })
 })
 
+const updateProfile = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const payload = req.body;
+
+    const verifiedToken = req.user;
+    const user = await UserServices.updateProfile(payload, verifiedToken as JwtPayload)
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Profile Updated Successfully",
+        data: user
+    })
+})
+
+const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id as string;
+    const payload = req.body;
+
+    const verifiedToken = req.user;
+
+    const user = await UserServices.updateUser(userId, payload, verifiedToken as JwtPayload)
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "User Updated Successfully",
+        data: user
+    })
+})
+
+const deleteUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.id as string
+    const result = await UserServices.deleteUser(userId);
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.OK,
+        message: "User Deleted Successfully",
+        data: result.data
+    })
+})
+
 export const UserControllers = {
     createUser,
     getMe,
-    getAllUsers
+    getAllUsers,
+    getSingleUser,
+    deleteUser,
+    updateUser,
+    updateProfile
 }
